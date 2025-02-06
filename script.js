@@ -47,7 +47,7 @@ clickSound.volume = 1;
 winSound.volume = 1;
 const handleClick = (e) => {
     const index = parseInt(e.target.dataset.index);
-    if (gameBoard[index] === '' && gameActive && currentPlayer === 'x') {
+    if (gameBoard[index] === '' && gameActive) {
         playMove(index);
         if (gameActive && aiMode && currentPlayer === 'o') {
             setTimeout(aiMove, 500);
