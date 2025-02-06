@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Tic-Tac-Toe</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      background: linear-gradient(to right, #ff7eb3, #ff758c, #ff7eb3);
+      font-family: 'Poppins', sans-serif;
+      user-select: none;
+      color: white;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 120px);
+      grid-template-rows: repeat(3, 120px);
+      grid-gap: 8px;
+      background-color: #333;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    .cell {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 70px;
+      cursor: pointer;
+      background-color: white;
+      border-radius: 8px;
+      transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+    .cell:hover {
+      background-color: #ddd;
+      transform: scale(1.1);
+    }
+    .cell.x {
+      color: #007bff;
+      text-shadow: 0 0 10px #007bff;
+    }
+    .cell.o {
+      color: #dc3545;
+      text-shadow: 0 0 10px #dc3545;
+    }
+    .winner {
+      background-color: gold !important;
+      animation: bounce 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes bounce {
+      from { transform: scale(1); }
+      to { transform: scale(1.1); }
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    button {
+      padding: 12px 20px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 90px;
+      background-color: transparent;
+      color: #fff;
+    }
+    .scoreboard {
+      display: flex;
+      justify-content: space-between;
+      width: 300px;
+      font-size: 18px;
+      margin-top: 10px;
+    }
+    #reset{
+      position: fixed;
+      left: 5px;
+      top: 5px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    .switch input {
+      width: 0;
+      opacity: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    #mode .slider:before{
+      content: "👥";
+    }
+    #sound-mode .slider:before{
+      content: "🔇";
+    }
+    #mode input:checked + .slider:before {
+      content: "🤖";
+    }
+    #sound-mode input:checked + .slider:before {
+      content: "🔊";
+    }
+    #mode input:checked + .slider, #sound-mode input:checked + .slider {
+      background-color: #1e88e5;
+    }
+    #mode input:checked + .slider:before, #sound-mode input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    #mode{
+      position: fixed;
+      right: 5px;
+      top: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 90px;
+      border: 1px solid #ccc;
+    }
+    #sound-mode{
+      position: fixed;
+      left: 50%;
+      bottom: 5px;
+      transform: translate(-50%, -50%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 10px;
+      border-radius: 90px;
+      border: 1px solid #ccc;
+    }
+    #mode span, #sound-mode span{
+      color: #b0b0b0;
+      transition: 0.4s;
+    }
+    #mode .active, #sound-mode .active {
+      color: #fff;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="board" class="board">
+    <div class="cell" data-index='0'></div>
+    <div class="cell" data-index='1'></div>
+    <div class="cell" data-index='2'></div>
+    <div class="cell" data-index='3'></div>
+    <div class="cell" data-index='4'></div>
+    <div class="cell" data-index='5'></div>
+    <div class="cell" data-index='6'></div>
+    <div class="cell" data-index='7'></div>
+    <div class="cell" data-index='8'></div>
+  </div>
+  <div id="message">Turn: X</div>
+  <div class="scoreboard">
+    <span>X Wins: <span id="xWins">0</span></span>
+    <span>O Wins: <span id="oWins">0</span></span>
+    <span>Draws: <span id="draws">0</span></span>
+  </div>
+  <button id="reset">Reset Game</button>
+  <div id="mode">
+    <span id="player">Two player</span>
+    <div class="switch">
+      <input type="checkbox" checked id="checkbox">
+      <label class="slider" for="checkbox"></label>
+    </div>
+    <span class="active" id="ai">AI mode</span>
+  </div>
+  <div id="sound-mode">
+    <span style="color: #fff;">Sound Mode</span>
+    <div style="display: flex;justify-content: space-between;align-items: center; gap: 10px;">
+      <span id="off">Off</span>
+      <div class="switch">
+        <input type="checkbox" checked id="sound">
+        <label class="slider" for="sound"></label>
+      </div>
+      <span class="active" id="on">On</span>
+    </div>
+  </div>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then((registration) => {
+          console.log('Service Worker registered with scope: ', registration.scope);
+        })
+        .catch((error) => {
+          console.log('Service Worker registration failed: ', error);
+        });
+    });
+  }
+</script>
+  <script src="script.js"></script>
+</body>
+</html>
